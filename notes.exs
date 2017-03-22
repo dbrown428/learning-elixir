@@ -64,3 +64,56 @@ i = ["1", "2"]
 IO.puts "Subtract: #{h -- i}"
 IO.puts "head: #{hd(g)}"
 IO.puts "tail: #{tl(g)}"
+i2 = [104, 101, 108, 108, 111]
+IO.puts "list of ASCII numbers: #{i2}"
+
+# Accessing the length of a list is a linear operation: we need to traverse the whole list in order to figure out its size. Updating a list is fast as long as we are prepending elements. Calculating the length gets slower as the input grows.
+i3 = [104 | i2]
+IO.puts i3
+IO.puts "linear operation - length: #{length i3}"
+
+# Quotes
+j1 = 'hello'
+j2 = "hello"
+IO.puts "equivalent? #{j1 == j2}"
+
+# Tuples
+# Getting a tuple size or accessing an element by index is fast, as tuples are stored contiguously in memory.
+k = {:world, "hello"}
+IO.puts tuple_size k
+l = put_elem(k, 1, "great")
+IO.puts "equal tuples? #{k == l}"
+IO.puts "tuple element: #{elem(l, 0)}"
+
+# Simple Rule: the function is named 'size' if the operation is in constant time (ie. the value is pre-calculated) or 'length' if the operation is linear.
+# byte_size, tuple_size ~ constant time
+# length, String.length ~ linear time
+
+# String Concatenation
+IO.puts 'concatenate: #{"foo" <> "bar"}'
+
+# Boolean Operators - the first argument must be a boolean
+# Use AND, OR, NOT when expecting booleans.
+IO.puts "AND #{true and false}"
+IO.puts "OR #{false or is_atom(:example)}"
+IO.puts "NOT #{not false}"
+
+# OR and AND are short-circuit operators. Only execute right-side if left-side is not enough to determine the result.
+false and raise("This error will never be raised.")
+true or raise("This error will never be raised.")
+
+# These boolean operators accept all types.
+# Use &&, ||, ! if any arguments are non-boolean.
+IO.puts "1 || true? #{1 || true}"
+IO.puts "false || 11? #{false || 11}"
+IO.puts "nil && 13? #{nil && 13}"
+IO.puts "true && 17? #{true && 17}"
+
+# Equality Strictness
+IO.puts "1 == 1.0? #{1 == 1.0}"
+IO.puts "1 === 1.0? #{1 === 1.0}"
+
+# Compare different data types
+IO.puts "1 < :atom? #{1 < :atom}"
+
+# Match Operator
