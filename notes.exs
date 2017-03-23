@@ -117,3 +117,47 @@ IO.puts "1 === 1.0? #{1 === 1.0}"
 IO.puts "1 < :atom? #{1 < :atom}"
 
 # Match Operator
+m = 31
+IO.puts "31 = m? #{31 = m}"
+
+# Pattern Matching on tuples
+{n1, n2, n3} = {:happy, "day", 42}
+IO.puts "n1 = #{n1}\nn2 = #{n2}\nn3 = #{n3}"
+
+# Pattern Match on specific values
+{:happy, n4} = {:happy, 13}
+IO.puts "n4 = #{n4}"
+
+# Pattern match on lists
+[n5, n6, n7] = [1, 2, 3]
+IO.puts "n5 = #{n5}\nn6 = #{n6}\nn7 = #{n7}"
+
+# Matching head and tail
+[head | tail] = [1, 2, 3]
+IO.puts "head = #{head}"
+IO.puts "tail = #{tail}"    # no value output... ??
+
+# Pin Operator - match a variables value instead of rebinding
+n8 = 34
+{n9, n8} = {2, 34}
+IO.puts "match variable value: #{n9}"
+
+# underscore
+[h | _] = [1, 2, 3]
+IO.puts h
+
+# Case
+case {1, 2, 3} do
+    {4, 5, 6} -> IO.puts "No match"
+    {1, ^n8, 3} -> IO.puts "no match"
+    {1, o, 3} -> IO.puts "Matched pattern: #{o}"
+    _ -> IO.puts "match any value"
+end
+
+# Case guards
+case {1, 0, 3} do
+    {1, o1, 3} when o1 > 0 -> IO.puts "No match"
+    _ -> IO.puts "Default match"
+end
+
+
