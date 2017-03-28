@@ -1,5 +1,9 @@
 IO.puts "Playground"
 
+# =============================================================================
+# Basic Types
+# =============================================================================
+
 x = 4
 IO.puts "x: #{x}"
 
@@ -89,6 +93,10 @@ IO.puts "tuple element: #{elem(l, 0)}"
 # byte_size, tuple_size ~ constant time
 # length, String.length ~ linear time
 
+# =============================================================================
+# Basic Operators
+# =============================================================================
+
 # String Concatenation
 IO.puts 'concatenate: #{"foo" <> "bar"}'
 
@@ -115,6 +123,10 @@ IO.puts "1 === 1.0? #{1 === 1.0}"
 
 # Compare different data types
 IO.puts "1 < :atom? #{1 < :atom}"
+
+# =============================================================================
+# Pattern Matching
+# =============================================================================
 
 # Match Operator
 m = 31
@@ -146,7 +158,11 @@ IO.puts "match variable value: #{n9}"
 [h | _] = [1, 2, 3]
 IO.puts h
 
-# Case
+# =============================================================================
+# Control Structures
+# =============================================================================
+
+# Case - is useful when you need to match against different values.
 case {1, 2, 3} do
     {4, 5, 6} -> IO.puts "No match"
     {1, ^n8, 3} -> IO.puts "no match"
@@ -159,5 +175,74 @@ case {1, 0, 3} do
     {1, o1, 3} when o1 > 0 -> IO.puts "No match"
     _ -> IO.puts "Default match"
 end
+
+# Errors in guards do not leak, but make the guard fail
+case 1 do
+    x when hd(x) -> IO.puts "Won't match'"
+    x -> IO.puts "Got #{x}"
+end
+
+# The number of arguments in each anonymous function clause needs to be the same.
+f = fn
+    x, y when x > 0 -> x + y
+    x, y -> x * y
+    # x, y, z -> x * y + z ... will not work.
+end
+IO.puts "Anonymous fn with clauses and guards: #{f.(1, 3)}"
+
+# Cond - useful when you want to check different conditions and find the first
+#        one that evaluates to true. Equivalent to else-if in many imperative languages.
+cond do
+    2 + 2 == 5 -> "This will not be true"
+    2 * 2 == 3 -> "This will also not be true"
+    1 + 1 == 2 -> IO.puts "cond true"
+end
+
+# Cond considers any value besides nil and false to be true.
+cond do
+    hd([1,2,3]) -> IO.puts "1 is considered as true"
+end
+
+# if and unless are useful when you need to check for only one condition
+if true do
+    IO.puts "if true"
+end
+
+unless false do
+    IO.puts "unless false"
+end
+
+# false or nil
+if nil do
+    "this won't be seen"
+else
+    IO.puts "not nil"
+end
+
+# do/end blocks
+# this syntax is using 'keyword lists'.
+if true, do: IO.puts "do/end with comma separator"
+if false, do: IO.puts "do/end", else: IO.puts "keyword list with else"
+
+# the next two do/end blocks are equivalent:
+if true do 
+    a = 1 + 2
+    a + 10
+end
+
+if true, do: (
+    a = 1 + 2
+    a + 10
+)
+
+# do/end blocks are always bound to the outermost function call. Explicit
+# parantheses can change the block binding.
+IO.puts is_number(if true do 
+    1 + 2
+end)
+
+# =============================================================================
+# Binaries, strings, and char lists
+# =============================================================================
 
 
