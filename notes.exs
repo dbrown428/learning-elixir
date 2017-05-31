@@ -36,7 +36,7 @@ IO.puts "is atom? #{is_atom(e)}"
 IO.puts "is boolean? #{is_boolean(e)}"
 
 # Strings
-f = "Hello
+f = "hełło
 worldﬁ!"
 IO.puts f
 IO.puts "String length: #{String.length(f)}"
@@ -163,6 +163,7 @@ IO.puts h
 # =============================================================================
 
 # Case - is useful when you need to match against different values.
+# ^ operation allows you to pattern match against an existing variable.
 case {1, 2, 3} do
     {4, 5, 6} -> IO.puts "No match"
     {1, ^n8, 3} -> IO.puts "no match"
@@ -241,8 +242,96 @@ IO.puts is_number(if true do
     1 + 2
 end)
 
-# =============================================================================
-# Binaries, strings, and char lists
-# =============================================================================
 
+IO.puts "\n\n============================================================================="
+IO.puts "Binaries, strings, and char lists"
+IO.puts "============================================================================="
+
+IO.puts "\nUTF-8 and Unicode"
+IO.puts "=================================================================="
+IO.puts "• a string is a UTF-8 encoded binary."
+IO.puts "• Unicode is a standard (https://unicode-table.com/en/) that assigns code points to characters we know."
+IO.puts "• when representing code points in bytes they need to be encoded somehow., eg. UTF-8"
+IO.puts "• default encoding for Elixir is UTF-8"
+
+IO.puts "\nByte Size of UTF-8 encoded characters…"
+IO.puts "• byte size of 'L' is #{byte_size("L")}"
+IO.puts "• byte size of 'ł' is #{byte_size("ł")}"
+IO.puts "• byte size of '😀' is #{byte_size("😀")}"
+
+IO.puts "\nCompare string length and byte size of a UTF-8…"
+m = "hełło"
+IO.puts "• String length of 'hełło': #{String.length m}"
+IO.puts "• Byte size of 'hełło': #{byte_size m}"
+
+IO.puts "\nCodepoints…"
+# Note the ? is operating on a character and not a variable.
+IO.puts "• Code point for 'a': #{?a}"
+IO.puts "• Split a string (#{m}) into individual characters using 'String.codepoints':"
+Enum.map(String.codepoints(m), fn mm -> IO.puts "    #{mm}" end)
+
+IO.puts "\nBinaries"
+IO.puts "=================================================================="
+IO.puts "• a binary is a sequence of bytes, and the bytes can be organized in any way."
+IO.puts "• a binary is a bitstring where the number of bits is divisible by 8"
+IO.puts "• define a binary using <<>>"
+IO.puts "• example: <<0, 1, 2, 3>>"
+IO.puts "• byte size of <<0, 1, 2, 3>>: #{byte_size <<0, 1, 2, 3>>}"
+
+IO.puts "\nRemember a string (binary) is a sequence of bytes…"
+IO.puts "• is this binary '<<239, 191, 191>>' a valid string? #{String.valid? <<239, 191, 191>>}"
+IO.puts "• is this binary '<<104, 101, 197, 130, 197, 130, 111>>' a valid string? #{String.valid? <<104, 101, 197, 130, 197, 130, 111>>}"
+IO.puts "• this binary <<104, 101, 197, 130, 197, 130, 111>> as a string: #{<<104, 101, 197, 130, 197, 130, 111>>}"
+
+IO.puts "\nBinary Concatentation"
+IO.puts "• concatenate two binaries using the <> operator"
+IO.puts "• example: <<0, 1>> <> <<2, 3>> = <<0, 1, 2, 3>>"
+IO.puts "• is '<<0, 1>> <> <<2, 3>>' equal to <<0, 1, 2, 3>>? #{<<0, 1>> <> <<2, 3>> == <<0, 1, 2, 3>>}"
+
+IO.puts "\nTIP: Concatenate the null byte to see the inner binary representation…"
+m0 = "hełło" <> <<0>>
+mm0 = to_charlist(m0)
+IO.puts "Inner binary representation of '\"hełło\" <> <<0>>':"
+Enum.map(mm0, fn mm -> IO.puts "    #{mm}" end)
+
+IO.puts "\nBinaries allow modifiers to be given to store numbers bigger than 255…"
+IO.puts "• 104 is a valid number (0 to 255) to represent a byte: #{<<104>>}"
+IO.puts "• 256 is invalid and will be truncated to <<0>> also known as the null byte#{<<256>>}"
+IO.puts "• 256 can be stored using 16 bits: <<256 :: size(16)>>: <<1, 0>>"
+IO.puts "• 256 can be stored using UTF8: <<256 :: utf8>>: #{<<256 :: utf8>>}"
+IO.puts "• use the null byte (<<0>>) to see the inner binary represenation: <<256 :: utf8, 0>>: <<196, 128, 0>>"
+
+IO.puts "\nBitstring"
+IO.puts "• a bunch of bits"
+IO.puts "• is '<<1 :: size(1)>>' a bitstring? #{is_bitstring(<<1 :: size(1)>>)}"
+IO.puts "• is '<<1 :: size(1)>>' a binary? #{is_binary(<<1 :: size(1)>>)}"
+IO.puts "• is '<<1 :: size(8)>>' a bitstring? #{is_bitstring(<<1 :: size(8)>>)}"
+IO.puts "• is '<<1 :: size(8)>>' a binary? #{is_binary(<<1 :: size(8)>>)}"
+
+IO.puts "\nPattern match on binaries / bitstrings…"
+IO.puts "• Match: "
+case <<0, 1, 2>> do
+    <<0, 1, m3>> -> IO.puts "Is binary? #{is_binary m3}, Is bitstring? #{is_bitstring m3}, m3 = #{m3}"
+    _ -> IO.puts "match any value"
+end
+
+IO.puts "Unknown size input pattern match: "
+case <<0, 1, 2, 3, 4>> do
+    <<0, 1, m5 :: binary>> -> IO.puts "Is binary? #{is_binary m5}, Is bitstring? #{is_bitstring m5}, Byte Size: #{byte_size(m5)}"
+    _ -> IO.puts "match any value"
+end
+
+# string concatenation operator
+# string concatenation operation is actually a binary concatenation operator.
+"he" <> m4 = "hello"
+IO.puts "m4 = #{m4}"
+
+IO.puts "\nChar lists"
+IO.puts "=================================================================="
+o1 = 'hełło'
+o2 = "hełło"
+IO.puts "is_list 'hełło'? #{is_list o1}"
+IO.puts "is_list \"hełło\"? #{is_list o2}"
+IO.puts "code points in 'hełło' char list:"
+Enum.map(o1, fn o3 -> IO.puts o3 end)
 
