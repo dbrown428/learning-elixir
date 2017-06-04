@@ -309,29 +309,41 @@ IO.puts "• is '<<1 :: size(8)>>' a bitstring? #{is_bitstring(<<1 :: size(8)>>)
 IO.puts "• is '<<1 :: size(8)>>' a binary? #{is_binary(<<1 :: size(8)>>)}"
 
 IO.puts "\nPattern match on binaries / bitstrings…"
-IO.puts "• Match: "
-case <<0, 1, 2>> do
-    <<0, 1, m3>> -> IO.puts "Is binary? #{is_binary m3}, Is bitstring? #{is_bitstring m3}, m3 = #{m3}"
+IO.puts "• Match a known size <<104, 101, x>> = <<104, 101, 111>>: "
+case <<104, 101, 111>> do
+    <<104, 101, m3>> -> IO.puts "    x = #{m3}\n    Is x binary? #{is_binary m3}\n    Is x bitstring? #{is_bitstring m3}"
     _ -> IO.puts "match any value"
 end
 
-IO.puts "Unknown size input pattern match: "
-case <<0, 1, 2, 3, 4>> do
-    <<0, 1, m5 :: binary>> -> IO.puts "Is binary? #{is_binary m5}, Is bitstring? #{is_bitstring m5}, Byte Size: #{byte_size(m5)}"
+IO.puts "• Match an unknown size <<104, 101, x :: binary>> = <<104, 101, 197, 130, 197, 130, 111>>: "
+case <<104, 101, 197, 130, 197, 130, 111>> do
+    <<104, 101, m5 :: binary>> -> IO.puts "    x = #{m5}\n    Is x binary? #{is_binary m5}\n    Is x bitstring? #{is_bitstring m5}\n    Byte Size of x: #{byte_size(m5)}"
     _ -> IO.puts "match any value"
 end
 
-# string concatenation operator
-# string concatenation operation is actually a binary concatenation operator.
-"he" <> m4 = "hello"
-IO.puts "m4 = #{m4}"
+IO.puts "• achieve similar results with the string concatenation <> operator:"
+"he" <> m4 = "hełło"
+IO.puts "    \"he\" <> rest = \"hełło\": #{m4}"
 
 IO.puts "\nChar lists"
 IO.puts "=================================================================="
+IO.puts "• a list of code points."
+IO.puts "• used mostly when interfacing with Erlang."
+IO.puts "• create with single-quated literals: 'hełło'"
 o1 = 'hełło'
 o2 = "hełło"
-IO.puts "is_list 'hełło'? #{is_list o1}"
-IO.puts "is_list \"hełło\"? #{is_list o2}"
-IO.puts "code points in 'hełło' char list:"
-Enum.map(o1, fn o3 -> IO.puts o3 end)
+IO.puts "    Is 'hełło' a list? #{is_list o1}"
+IO.puts "    Is \"hełło\" a list? #{is_list o2}"
+IO.puts "    Code points for 'hełło' char list:"
+Enum.map(o1, fn o3 -> IO.puts "        #{o3}" end)
+
+IO.puts "\nConvert to string…"
+IO.puts "• polymorphic (char lists, integers, atoms, etc."
+IO.puts "• Convert 'hełło' to a string using to_string:"
+o3 = to_string(o1)
+IO.puts "    Is list? #{is_list o3}"
+
+IO.puts "\n\n============================================================================="
+IO.puts "Keywords and maps"
+IO.puts "============================================================================="
 
