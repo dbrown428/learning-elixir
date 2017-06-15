@@ -346,4 +346,111 @@ IO.puts "    Is list? #{is_list o3}"
 IO.puts "\n\n============================================================================="
 IO.puts "Keywords and maps"
 IO.puts "============================================================================="
+IO.puts "• associative data structures"
+
+IO.puts "\nKeyword Lists"
+IO.puts "=================================================================="
+IO.puts "• keyword lists are the default mechanism for passing options to functions"
+IO.puts "• provide same linear performance characteristics as lists, eg. the longer "
+IO.puts "  the list, the longer it will take to find a key, count the number of "
+IO.puts "  items... etc."
+IO.puts "• use a tuple to represent the key-value data structure"
+IO.puts "• the first item of the tuple (key) is an atom. The key must be an atom."
+IO.puts "• keys are ordered as specified by the developer."
+IO.puts "• keys can be given more than once."
+IO.puts "• {:key, value}"
+IO.puts "• example: [{:a, 1}, {:b, 2}]"
+
+p0 = [{:a, 1}, {:b, 2}]
+IO.puts "    What is the value of :a? #{p0[:a]}"
+IO.puts "    What is the value of :b? #{p0[:b]}"
+
+IO.puts "• there is also a special syntax for defining keyword lists: [key: value]"
+IO.puts "• example: [a: 1, b: 2]"
+p1 = [a: 1, b: 2]
+IO.puts "    [a: 1, b: 2] == [{:a, 1}, {:b, 2}]? #{p0 == p1}"
+
+p2 = [a: 0, a: 1, b: 2]
+IO.puts "• define the key more than once: [a: 0, a: 1, b: 2], what is :a? #{p2[:a]}"
+
+IO.puts "\nList operations…"
+IO.puts "• all operations available to lists can be used on keyword lists"
+p3 = [a: 1, b: 2] ++ [c: 3] == [a: 1, b: 2, c: 3]
+IO.puts "• addition (append): [a: 1, b: 2] ++ [c: 3] == [a: 1, b: 2, c: 3]? #{p3}"
+p4 = [c: 3] ++ [a: 1, b: 2] == [c: 3, a: 1, b: 2]
+IO.puts "• addition: (prepend): [c: 3] ++ [a: 1, b: 2] == [c: 3, a: 1, b: 2]? #{p4}"
+p5 = [a: 1, b: 2, c: 3] -- [b: 2] == [a: 1, c: 3]
+IO.puts "• subtraction: [a: 1, b: 2, c: 3] -- [b: 2] == [a: 1, c: 3]? #{}"
+
+IO.puts "\nIf macro…"
+IO.puts "• :do and :else are keyword lists."
+IO.puts "• in general when the keyword list is the last argument of a function, "
+IO.puts "  the square brackets are optional."
+IO.puts "• the following are equivalent statements:"
+IO.puts "    if false, do: :this, else: :that"
+IO.puts "    if (false, [do: :this, else: :that])"
+IO.puts "    if (false, [{:do, :this}, {:else, :that}]"
+
+IO.puts "\nPattern Matching…"
+IO.puts "• rarely done on keyword lists"
+IO.puts "• requires the number of items and their order to match"
+[a: p6] = [a: 1]
+IO.puts "• [a: a] = [a: 1], a = #{p6}"
+
+IO.puts "\nMaps"
+IO.puts "=================================================================="
+IO.puts "• the go to data structure"
+IO.puts "• allow any value as a key."
+IO.puts "• do not follow any ordering."
+IO.puts "• very helpful with pattern matching."
+IO.puts "• created using the %{} syntax:"
+q1 = %{:a => 1, 2 => :b}
+IO.puts "    %{:a => 1, 2 => :b}"
+IO.puts "    What is the value of :a? #{q1[:a]}"
+IO.puts "    What is the value of 2? #{q1[2]}"
+IO.puts "    What is the value of :c? #{q1[:c]} nil"
+
+IO.puts "\nPattern Matching…"
+IO.puts "• will always match on a subset of the given value:"
+IO.puts "    %{:a => a} = %{:a => 1, 2 => :b}"
+case %{:a => 1, 2 => :b} do
+    %{:a => a} -> IO.puts "        a = #{a}"
+    _ -> IO.puts "        No match found."
+end
+
+IO.puts "    %{:c => c} = %{:a => 1, 2 => :b}"
+case %{:a => 1, 2 => :b} do
+    %{:c => c} -> IO.puts "        c = #{c}"
+    _ -> IO.puts "        No match found."
+end
+
+IO.puts "• an empty map matches all maps:"
+IO.puts "    %{} = %{:a => 1, 2 => :b}"
+case %{:a => 1, 2 => :b} do
+    %{} -> IO.puts "        match all maps"
+end
+
+IO.puts "• variables can be used when accessing, matching and adding key maps."
+q2 = 1
+q3 = %{q2 => :one}
+IO.puts "    q2 = 1"
+IO.puts "    q3 = %{q2 => :one}"
+IO.puts "    q3[q2]? #{q3[q2]}"
+IO.puts "• remember the ^ operator allows you to match against an existing variable"
+IO.puts "    %{^q2 => one} = %{1 => :one, 2 => :two, 3 => :three}"
+case %{1 => :one, 2 => :two, 3 => :three} do
+    %{^q2 => one} -> IO.puts "        Match!"
+end
+
+IO.puts "\nManipulate Maps…"
+q4 = %{:a => 1, 2 => :b}
+q5 = Map.get(q4, :a)
+IO.puts "• Map.get(%{:a => 1, 2 => :b}, :a) = #{q5}"
+IO.puts "• Map.put(%{:a => 1, 2 => :b}, :c, 3) == %{2 => :b, :a => 1, :c => 3}? #{Map.put(q4, :c, 3) == %{2 => :b, :a => 1, :c => 3}}"
+IO.puts "• Map.to_list(%{:a => 1, 2 => :b}) == [{2, :b}, {:a, 1}]? #{Map.to_list(q4) == [{2, :b}, {:a, 1}]}"
+IO.puts "• update a key's value (key must exist):"
+q6 = %{q4 | 2 => "two"}
+IO.puts "    %{%{:a => 1, 2 => :b} | 2 => \"two\"} == %{:a => 1, 2 => :b}? #{q4 == q6}"
+IO.puts "• the | cannot be used to add new keys".
+
 
