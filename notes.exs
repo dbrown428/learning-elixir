@@ -480,7 +480,117 @@ IO.puts "•  John's age after update? #{q7[:john].age}"
 q7 = update_in q7[:mary].languages, fn languages -> List.delete(languages, "Clojure") end
 IO.puts "• How many languages does Mary know after update? #{length q7[:mary].languages}"
 
-
 IO.puts "\n\n============================================================================="
 IO.puts "Modules and Functions"
 IO.puts "============================================================================="
+IO.puts "• groups several functions into modules."
+IO.puts "• create a module using the 'defmodule' macro, and 'def' to define functions."
+IO.puts "• it's convenient to write modules into files so they can be compiled and reused."
+
+defmodule Math do
+    def sum(a, b) do
+        a + b
+    end
+end
+
+IO.puts "    Math.sum(1, 2) = #{Math.sum(1, 2)}"
+
+IO.puts "• projects are usually organized into three directories:"
+IO.puts "    ebin - contains the compiled bytecode"
+IO.puts "    lib - contains elixir code (usually .ex files)"
+IO.puts "    test - contains tests (usually .exs files)"
+IO.puts "• mix will be responsible for compiling and setting up proper paths"
+
+IO.puts "\nScripted Mode…"
+IO.puts "• .exs files are for scripting"
+IO.puts "• .ex files are meant to be compiled"
+IO.puts "• when executed, both extensions compile and load their modules into memory"
+IO.puts "• .ex files write bytecode to disk in the format of .beam files"
+
+IO.puts "\nNamed functions…"
+IO.puts "• private functions are defined with 'defp'"
+defmodule LoveLife do
+    def sum(a, b) do
+        do_sum(a, b)
+    end
+
+    defp do_sum(a, b) do
+        a + b
+    end
+end
+
+IO.puts "    LoveLife.sum(4, 5) = #{LoveLife.sum(4, 5)}"
+defmodule GuardsMultipleClauses do
+    def zero?(0) do
+        true
+    end
+
+    def zero?(x) when is_integer(x) do
+        false
+    end
+end
+
+IO.puts "    GuardsMultipleClauses.zero?(0)? #{GuardsMultipleClauses.zero?(0)}"
+IO.puts "    GuardsMultipleClauses.zero?(2)? #{GuardsMultipleClauses.zero?(2)}"
+IO.puts "• given an argument that does not match any of the clauses raises an error."
+IO.puts "• named functions support both do: and do/end block syntax"
+defmodule DoBlock do
+    def zero?(0), do: true
+    def zero?(x) when is_float(x), do: false
+end
+
+IO.puts "\nFunction Capturing…"
+IO.puts "• retrieve a named function as a function type"
+IO.puts "• capture a local or imported function in the same way: q = &is_function/1"
+IO.puts "• capture a function from a module: q = &Math.zero?/1"
+
+q8 = &GuardsMultipleClauses.zero?/1
+q9 = &GuardsMultipleClauses.zero?/2
+IO.puts "    is 'q' a function? #{is_function(q8)}"
+IO.puts "    is 'q' a function? #{is_function(q9)}"
+IO.puts "• remember an anonymous function must be invoked with a dot (.)"
+IO.puts "• the capture operator allows named functions to be assigned, passed"
+IO.puts "  and invoked just like anonymous functions."
+IO.puts "• the capture syntax can also be used as a shortcut for creating functions."
+q10 = &(&1+1)
+IO.puts "    &(&1+1) is equivalent to fn x -> x + 1 end"
+IO.puts "    q10.(1) = #{q10.(1)}"
+IO.puts "• the &1 represents the first argument passed into the function."
+IO.puts "    q = &List.flatten(&1, &2) is equivalent to fn(list, tail) -> List.flatten(list, tail) end"
+
+IO.puts "\nDefault Arguments…"
+IO.puts "• named functions support default arguments: \\ \"value\""
+defmodule Concat do
+    def join(a, b, sep \\ "-") do
+        # remember <> is a string concatenator
+        a <> sep <> b
+    end
+end
+
+IO.puts "    #{Concat.join("Hello", "World")}"
+IO.puts "    #{Concat.join("Hello", "World", "+")}"
+IO.puts "• default values are only evaluated if they have to be used."
+IO.puts "• be cautious of function definition order with default values."
+IO.puts "• if a function has multiple clauses, it is required to create a"
+IO.puts "  function head without an actual body."
+
+defmodule Words do
+    def join(a, b \\ nil, sep \\ "_")
+
+    def join(a, b, sep) when is_nil(b) do
+        a
+    end
+
+    def join(a, b, sep) do
+        a <> sep <> b
+    end
+end
+
+IO.puts "    #{Words.join("Hello", "World")}"
+IO.puts "    #{Words.join("Hello", "World", "+")}"
+IO.puts "    #{Words.join("Hello")}"
+
+IO.puts "\n\n============================================================================="
+IO.puts "Recursion"
+IO.puts "============================================================================="
+
