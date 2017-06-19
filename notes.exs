@@ -451,6 +451,36 @@ IO.puts "• Map.to_list(%{:a => 1, 2 => :b}) == [{2, :b}, {:a, 1}]? #{Map.to_li
 IO.puts "• update a key's value (key must exist):"
 q6 = %{q4 | 2 => "two"}
 IO.puts "    %{%{:a => 1, 2 => :b} | 2 => \"two\"} == %{:a => 1, 2 => :b}? #{q4 == q6}"
-IO.puts "• the | cannot be used to add new keys".
+IO.puts "• the | cannot be used to add new keys"
+
+IO.puts "\nAccessing atom keys…"
+IO.puts "• %{:a => 1, 2 => :b}.a = #{%{:a => 1, 2 => :b}.a}"
+IO.puts "• use the map.field syntax and pattern matching instead of functions in the Map module."
+
+IO.puts "\nNested Data Structures"
+IO.puts "=================================================================="
+IO.puts "• conveniences for manipulaing nested data structures, such as:"
+IO.puts "    put_in"
+IO.puts "    update_in"
+IO.puts "    get_and_update_in"
+IO.puts "• maintains the immutable properties of the language."
+
+q7 = [
+    john: %{name: "John", age: 27, languages: ["Erlang", "Ruby", "Elixir"]},
+    mary: %{name: "Mary", age: 29, languages: ["Elixir", "F#", "Clojure"]}
+]
+
+IO.puts "    What is John's age? #{q7[:john].age}"
+IO.puts "    How many languages does Mary know? #{length q7[:mary].languages}"
+IO.puts "    How many user's are there? #{length q7}"
+
+# these statements mutate the data…
+q7 = put_in q7[:john].age, 31
+IO.puts "•  John's age after update? #{q7[:john].age}"
+q7 = update_in q7[:mary].languages, fn languages -> List.delete(languages, "Clojure") end
+IO.puts "• How many languages does Mary know after update? #{length q7[:mary].languages}"
 
 
+IO.puts "\n\n============================================================================="
+IO.puts "Modules and Functions"
+IO.puts "============================================================================="
