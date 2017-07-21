@@ -71,6 +71,10 @@ IO.puts "tail: #{tl(g)}"
 i2 = [104, 101, 108, 108, 111]
 IO.puts "list of ASCII numbers: #{i2}"
 
+# prepend items to a list with |
+# list = [1,2,3]
+# [0 | list]
+
 # Accessing the length of a list is a linear operation: we need to traverse the whole list in order to figure out its size. Updating a list is fast as long as we are prepending elements. Calculating the length gets slower as the input grows.
 i3 = [104 | i2]
 IO.puts i3
@@ -594,3 +598,113 @@ IO.puts "\n\n===================================================================
 IO.puts "Recursion"
 IO.puts "============================================================================="
 
+defmodule Loop do
+    def print_multiple_times(message, count) when count <= 1 do
+        IO.puts message
+    end
+
+    def print_multiple_times(message, count) do
+        IO.puts message
+        print_multiple_times(message, count - 1)
+    end
+end
+
+Loop.print_multiple_times("Hello!", 3)
+
+defmodule Reducing do
+    def sum_list([head | tail], accumulator) do
+        sum_list(tail, head + accumulator)
+    end
+
+    def sum_list([], accumulator) do
+        accumulator
+    end
+end
+
+IO.puts Reducing.sum_list([1,2,3], 0)
+
+defmodule Mapping do
+    def double_each([head | tail]) do
+        #prepend the doubled head value to the list
+        [head * 2 | double_each(tail)]
+    end
+
+    def double_each([]) do
+        []
+    end
+end
+
+Mapping.double_each([1,2,3])
+
+IO.puts "\n\n============================================================================="
+IO.puts "Enumerables"
+IO.puts "============================================================================="
+
+IO.puts "• You rarely use recursion as above to manipulate lists. Use the Enum module."
+IO.puts "• all the functions in the Enum module are eager, eg. expect an enumerable and "
+IO.puts "  return a list back."
+r0 = Enum.reduce([1,2,3], 0, fn(x, acc) -> x + acc end)
+IO.puts "    Enum.reduce([1,2,3]… #{r0}"
+r1 = Enum.map([1,2,3], fn(x) -> x * 2 end)
+IO.puts "    Enum.map([1,2,3], fn x -> x * 2 end"
+Enum.map(r1, fn rr1 -> IO.puts rr1 end)
+
+r2 = Enum.map(%{1 => 2, 3 => 4}, fn {k, v} -> k * v end)
+IO.puts r2
+
+IO.puts "\nRanges"
+IO.puts "• Enum.map(1..3, fn x -> x * 2 end)"
+Enum.map(1..3, fn rr3 -> IO.puts "    #{rr3 * 3}" end)
+
+r4 = Enum.reduce(1..3, 0, fn(rr4, acc) -> rr4 + acc end)
+IO.puts "• Enum.reduce(1..3, 0, fn (x, acc) -> x + acc end)"
+IO.puts "    #{r4}"
+
+# We are capturing the function in a value. Equivalent to: fn x -> rem(x, 2) != 0 end
+r5_odd? = &(rem(&1, 2) != 0)
+r5 = Enum.filter(1..3, r5_odd?)
+IO.puts "• Enum.filter(1..3, fn x -> rem(x, 2) != 0 end)"
+Enum.map(r5, fn x -> IO.puts "    #{x}" end)
+
+IO.puts "\nPipe Operator"
+IO.puts "• Takes output from the expression on the left side and passes it as the first"
+IO.puts "  argument to the function on the right side."
+r6? = &(&1 * 3)
+r7 = 1..100_000 
+    |> Enum.map(r6?)
+    |> Enum.filter(r5_odd?)
+    |> Enum.sum
+
+IO.puts "    1..100_000"
+IO.puts "        |> Enum.map(r6?)"
+IO.puts "        |> Enum.filter(r5_odd?)"
+IO.puts "        |> Enum.sum"
+IO.puts "    = #{r7}"
+
+IO.puts "\nStreams"
+IO.puts "• streams are lazy, composable enumerables"
+IO.puts "• streams build a series of computations that are invoked only when"
+IO.puts "  we pass the underlying stream to the Enum module."
+IO.puts "• streams are useful when working with large, possibly infinite, collections."
+
+r8 = 1..100_100
+    |> Stream.map(r6?)
+    |> Stream.filter(r5_odd?)
+    |> Enum.sum
+
+IO.puts "    1..100_100"
+IO.puts "        |> Stream.map(&(&1 *3))"
+IO.puts "        |> Stream.filter(r5_odd?)"
+IO.puts "        |> Enum.sum"
+IO.puts "    = #{r8}"
+
+r9 = Stream.cycle([1,2,3])
+rr9 = Enum.take(r9, 10)
+
+IO.puts "• Stream.unfold(\"hełło\", &String.next_codepoint/1)"
+r10 = Stream.unfold("hełło", &String.next_codepoint/1)
+rr10 = Enum.take(r10, 3)
+Enum.map(rr10, fn x -> IO.puts "    #{x}" end)
+
+IO.puts "• Stream.resource/3"
+# Enum.take(stream, 10)
