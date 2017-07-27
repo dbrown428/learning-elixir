@@ -138,7 +138,9 @@ IO.puts "31 = m? #{31 = m}"
 
 # Pattern Matching on tuples
 {n1, n2, n3} = {:happy, "day", 42}
-IO.puts "n1 = #{n1}\nn2 = #{n2}\nn3 = #{n3}"
+IO.puts "n1 = #{n1}"
+IO.puts "n2 = #{n2}"
+IO.puts "n3 = #{n3}"
 
 # Pattern Match on specific values
 {:happy, n4} = {:happy, 13}
@@ -297,6 +299,7 @@ m0 = "hełło" <> <<0>>
 mm0 = to_charlist(m0)
 IO.puts "Inner binary representation of '\"hełło\" <> <<0>>':"
 Enum.map(mm0, fn mm -> IO.puts "    #{mm}" end)
+IO.puts inspect mm0
 
 IO.puts "\nBinaries allow modifiers to be given to store numbers bigger than 255…"
 IO.puts "• 104 is a valid number (0 to 255) to represent a byte: #{<<104>>}"
@@ -340,6 +343,7 @@ IO.puts "    Is 'hełło' a list? #{is_list o1}"
 IO.puts "    Is \"hełło\" a list? #{is_list o2}"
 IO.puts "    Code points for 'hełło' char list:"
 Enum.map(o1, fn o3 -> IO.puts "        #{o3}" end)
+IO.puts "        #{inspect o1}"
 
 IO.puts "\nConvert to string…"
 IO.puts "• polymorphic (char lists, integers, atoms, etc."
@@ -708,3 +712,154 @@ Enum.map(rr10, fn x -> IO.puts "    #{x}" end)
 
 IO.puts "• Stream.resource/3"
 # Enum.take(stream, 10)
+
+IO.puts "\n\n============================================================================="
+IO.puts "Processes"
+IO.puts "============================================================================="
+
+IO.puts "• all code runs inside processes"
+IO.puts "• processes are isolated from each other, run concurrent to one another,"
+IO.puts "  and communicate via message passing."
+IO.puts "• extrememly lightweight in terms of memory and CPU"
+
+IO.puts "\nspawn"
+IO.puts "• takes a function and executes it in another process"
+IO.puts "• returns a process identifier"
+
+pid1 = spawn fn -> 1 + 2 end
+IO.puts "Is process alive? #{Process.alive?(pid1)}"
+
+pid2 = self()
+IO.puts "Is process alive? #{Process.alive?(pid2)}"
+
+IO.puts "\nSend and Receive"
+IO.puts "• when a message is sent to a process, the message is stored in the process mailbox."
+IO.puts "• the process that sends the message does not block on send/2. It puts the message in"
+IO.puts "  the receipent's mailbox and continues."
+IO.puts "\nsending message to self…\n"
+send self(), {:hello, "world"}
+
+IO.puts "• the receive block goes through the current process mailbox searching for a message"
+IO.puts "  that matches any of the given patterns."
+IO.puts "• receive supports guards and many clauses, such as case/2"
+IO.puts "• if there is no message in the mailbox matching any of the patterns, the current"
+IO.puts "  process will wait until a matching message arrives."
+
+receive do
+    {:hello, msg} -> IO.puts "\nMessage Received: #{msg}\n"
+    {:world, msg} -> IO.puts "Won't match"
+after
+    1_000 -> IO.puts "Nothing after 1 second"
+end
+
+IO.puts "• a timeout of 0 can be given when you already expect the message to be in the mailbox."
+
+IO.puts "\ninspect"
+IO.puts "• used to convert a data structure's internal representation into a string."
+r11 = [{:hello, "world"}, {:goodbye, "world"}]
+IO.puts inspect r11
+
+IO.puts "\nflush"
+IO.puts "• used for debugging in the shell"
+IO.puts "• flushes and prints all the messages in the mailbox"
+
+IO.puts "\nLinks"
+IO.puts "• links allow processes to establish a relationship in case of failures."
+IO.puts "• processes are isolated and don't share anything by default."
+IO.puts "• if we want failure in one process to propagate to another one, we should link them."
+IO.puts "• if an error occurs in a spawned process it will be logged."
+IO.puts "• linking processes will allow errors to propagate"
+IO.puts "• we often link our processes to supervisors which will detect when a process dies and start a new process."
+IO.puts "• processes and links play an important role when building fault-tolerant systems."
+
+IO.puts "\nspawn fn -> raise \"oops\" end"
+IO.puts "• this will crash the process, but the parent process will be unaffected."
+
+IO.puts "\nspawn_link fn -> raise \"oops\" end"
+IO.puts "• this will crash the process and the parent process, because the parent process can is not setup to handle this failure."
+
+IO.puts "• linking can also be done manually using 'Process.link/1'"
+
+
+IO.puts "\nTasks"
+IO.puts "• tasks are built on top of spawn functions to provide better error reports and introspection."
+q1 = Task.start fn -> IO.puts "hello world" end
+IO.puts inspect q1
+
+# task.async
+# task.await
+
+IO.puts "\nState"
+IO.puts "• imagine a process that loops indefinitely and maintains state (if your application requires state (eg. configuration from file)"
+IO.puts "• seldom will you implement this pattern as there are many other abstractions that can help, such as Agent."
+
+IO.puts "Agent.start_link(fn)"
+IO.puts "Agent.update(pid, fn)"
+IO.puts "Agent.get(pid, fn)"
+
+IO.puts "\n\n============================================================================="
+IO.puts "IO and the file system"
+IO.puts "============================================================================="
+
+IO.puts "\nIO Module"
+IO.puts "• main mechanism for reading/writing to standard input/output, standard error,"
+IO.puts "  files, and other IO devices"
+
+q2 = IO.gets "Y or N?"
+IO.puts q2
+
+IO.puts "• change where the IO module reads from by passing an argument:"
+IO.puts "   IO.puts :stderr, \"hello world\""
+IO.puts :stderr, "hello world"
+
+IO.puts "\nFile Module"
+IO.puts "• files are opened in binary mode by default"
+IO.puts "• a tuple is returned, that we can pattern match against."
+IO.puts "• {:ok, file} where file is actually a process id."
+{:ok, file} = File.open "hello", [:write]
+IO.binwrite file, "world"
+File.close file
+IO.puts inspect File.read "hello"
+
+IO.puts "• a file can also be opened with :utf8 encoding"
+IO.puts "• many functions are named after their UNIX equivalents, such as: "
+IO.puts "      File.rm/1"
+IO.puts "      File.mkdir/1"
+IO.puts "      File.cp_r/2"
+IO.puts "      File.rm_rf/1"
+
+IO.puts "• ! (trailing bang) variant will return the contents of the file instead of a tuple."
+IO.puts File.read! "hello"
+IO.puts inspect File.read "hello"
+
+IO.puts "• the version without ! is preferred when you want to handle different outcomes using pattern matching"
+case File.read("hello") do
+    {:ok, content} -> IO.puts "    #{content}"
+    {:error, reason} -> IO.puts "    handle error"
+end
+
+IO.puts "• if you expect the file to be there, the bang variation is more useful as it raises a meaningful error message."
+IO.puts "• if you don't want to handle the error outcomes, prefer user File.read!/1"
+IO.puts "      {:ok, content} = File.read(\"test\") -> if file \"test\" does not exist this is just a pattern match error."
+
+case File.read("test") do
+    {:ok, content} -> IO.puts "    #{content}"
+    {:error, reason} -> IO.puts "    error reading file: #{reason}"
+end
+
+IO.puts "\nPath Module"
+IO.puts "• the File module expect paths as arguments"
+IO.puts "• use the Path module functions instead of directly manipulating strings"
+IO.puts "• takes care of different operating systems transparently."
+q3 = Path.join("foo", "bar")
+IO.puts "    Path.join(\"foo\", \"bar\")"
+IO.puts "        #{q3}"
+q4 = Path.expand("~/hello")
+IO.puts "    Path.expand(\"~/hello\")"
+IO.puts "        #{q4}"
+
+IO.puts "\nGroup Leaders"
+IO.puts "• the file open returns a tuple with the process id (file), eg. {:ok, file} = File.open(\"hello\")"
+IO.puts "• by modelling IO devices with processes this allows different nodes on the same network"
+IO.puts "  to exchange file processes in order to read/write files between nodes."
+IO.puts "• the group leader is a special process"
