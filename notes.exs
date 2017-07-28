@@ -495,12 +495,15 @@ IO.puts "• groups several functions into modules."
 IO.puts "• create a module using the 'defmodule' macro, and 'def' to define functions."
 IO.puts "• it's convenient to write modules into files so they can be compiled and reused."
 
+IO.puts """
 defmodule Math do
     def sum(a, b) do
         a + b
     end
 end
+"""
 
+require Math
 IO.puts "    Math.sum(1, 2) = #{Math.sum(1, 2)}"
 
 IO.puts "• projects are usually organized into three directories:"
@@ -517,6 +520,7 @@ IO.puts "• .ex files write bytecode to disk in the format of .beam files"
 
 IO.puts "\nNamed functions…"
 IO.puts "• private functions are defined with 'defp'"
+IO.puts """
 defmodule LoveLife do
     def sum(a, b) do
         do_sum(a, b)
@@ -526,8 +530,11 @@ defmodule LoveLife do
         a + b
     end
 end
+"""
 
+require LoveLife
 IO.puts "    LoveLife.sum(4, 5) = #{LoveLife.sum(4, 5)}"
+IO.puts """
 defmodule GuardsMultipleClauses do
     def zero?(0) do
         true
@@ -537,15 +544,19 @@ defmodule GuardsMultipleClauses do
         false
     end
 end
+"""
 
+require GuardsMultipleClauses
 IO.puts "    GuardsMultipleClauses.zero?(0)? #{GuardsMultipleClauses.zero?(0)}"
 IO.puts "    GuardsMultipleClauses.zero?(2)? #{GuardsMultipleClauses.zero?(2)}"
 IO.puts "• given an argument that does not match any of the clauses raises an error."
 IO.puts "• named functions support both do: and do/end block syntax"
+IO.puts """
 defmodule DoBlock do
     def zero?(0), do: true
     def zero?(x) when is_float(x), do: false
 end
+"""
 
 IO.puts "\nFunction Capturing…"
 IO.puts "• retrieve a named function as a function type"
@@ -568,20 +579,23 @@ IO.puts "    q = &List.flatten(&1, &2) is equivalent to fn(list, tail) -> List.f
 
 IO.puts "\nDefault Arguments…"
 IO.puts "• named functions support default arguments: \\ \"value\""
+IO.puts """
 defmodule Concat do
     def join(a, b, sep \\ "-") do
         # remember <> is a string concatenator
         a <> sep <> b
     end
 end
+"""
 
+require Concat
 IO.puts "    #{Concat.join("Hello", "World")}"
 IO.puts "    #{Concat.join("Hello", "World", "+")}"
 IO.puts "• default values are only evaluated if they have to be used."
 IO.puts "• be cautious of function definition order with default values."
 IO.puts "• if a function has multiple clauses, it is required to create a"
 IO.puts "  function head without an actual body."
-
+IO.puts """
 defmodule Words do
     def join(a, b \\ nil, sep \\ "_")
 
@@ -593,7 +607,9 @@ defmodule Words do
         a <> sep <> b
     end
 end
+"""
 
+require Words
 IO.puts "    #{Words.join("Hello", "World")}"
 IO.puts "    #{Words.join("Hello", "World", "+")}"
 IO.puts "    #{Words.join("Hello")}"
@@ -602,6 +618,7 @@ IO.puts "\n\n===================================================================
 IO.puts "Recursion"
 IO.puts "============================================================================="
 
+IO.puts """
 defmodule Loop do
     def print_multiple_times(message, count) when count <= 1 do
         IO.puts message
@@ -612,9 +629,12 @@ defmodule Loop do
         print_multiple_times(message, count - 1)
     end
 end
+"""
 
+require Loop
 Loop.print_multiple_times("Hello!", 3)
 
+IO.puts """
 defmodule Reducing do
     def sum_list([head | tail], accumulator) do
         sum_list(tail, head + accumulator)
@@ -624,9 +644,12 @@ defmodule Reducing do
         accumulator
     end
 end
+"""
 
+require Reducing
 IO.puts Reducing.sum_list([1,2,3], 0)
 
+IO.puts """
 defmodule Mapping do
     def double_each([head | tail]) do
         #prepend the doubled head value to the list
@@ -637,7 +660,9 @@ defmodule Mapping do
         []
     end
 end
+"""
 
+require Mapping
 Mapping.double_each([1,2,3])
 
 IO.puts "\n\n============================================================================="
@@ -704,6 +729,7 @@ IO.puts "    = #{r8}"
 
 r9 = Stream.cycle([1,2,3])
 rr9 = Enum.take(r9, 10)
+IO.puts inspect rr9
 
 IO.puts "• Stream.unfold(\"hełło\", &String.next_codepoint/1)"
 r10 = Stream.unfold("hełło", &String.next_codepoint/1)
@@ -747,7 +773,7 @@ IO.puts "  process will wait until a matching message arrives."
 
 receive do
     {:hello, msg} -> IO.puts "\nMessage Received: #{msg}\n"
-    {:world, msg} -> IO.puts "Won't match"
+    {:world, msg} -> IO.puts "Won't match: #{msg}"
 after
     1_000 -> IO.puts "Nothing after 1 second"
 end
@@ -835,7 +861,7 @@ IO.puts inspect File.read "hello"
 IO.puts "• the version without ! is preferred when you want to handle different outcomes using pattern matching"
 case File.read("hello") do
     {:ok, content} -> IO.puts "    #{content}"
-    {:error, reason} -> IO.puts "    handle error"
+    {:error, reason} -> IO.puts "    handle error: #{reason}"
 end
 
 IO.puts "• if you expect the file to be there, the bang variation is more useful as it raises a meaningful error message."
