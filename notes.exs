@@ -889,3 +889,49 @@ IO.puts "• the file open returns a tuple with the process id (file), eg. {:ok,
 IO.puts "• by modelling IO devices with processes this allows different nodes on the same network"
 IO.puts "  to exchange file processes in order to read/write files between nodes."
 IO.puts "• the group leader is a special process"
+
+IO.puts "\n\n============================================================================="
+IO.puts "Alias, require, and import"
+IO.puts "============================================================================="
+
+IO.puts "\nalias"
+IO.puts "• allows you to setup aliases for any given module name, eg. I want to call Bar instead of Foo.Bar "
+IO.puts "    alias Foo.Bar, as: Bar"
+IO.puts "• you can omit the as: portion and the alias will automatically be the last part of the module name."
+IO.puts "    alias Foo.Bar"
+IO.puts "       ^^ is the same as alias Foo.Bar as: Bar"
+IO.puts "• alias is lexically scoped, so you can set aliases inside specific functions"
+IO.puts "• multi-alias can be achieve like so…"
+IO.puts "   alias MyApp.{Foo, Bar, Baz}"
+
+IO.puts "\nrequire"
+IO.puts "• in order to use macros in modules, you need to opt-in by requiring the module they are defined in."
+IO.puts "• require is lexically scoped, so you can require inside specific functions"
+
+IO.puts "\nimport"
+IO.puts "• used when you want to easily access functions or macros from other modules without using the fully qualified name."
+IO.puts "• when you import a module, it automatically requires it."
+IO.puts "• lexically scoped so you can import insider function definitions."
+IO.puts "• Instead of doing List.duplicate :ok, 3…"
+IO.puts "    import List, only: [duplicate: 2]"
+IO.puts "    duplicate :ok, 3"
+IO.puts "• Import options…"
+IO.puts "    only: (No need to import all the functions)"
+IO.puts "        :macros (only import macros) > import Integer, only: :macros"
+IO.puts "        :functions (only import functions) > import Integer, only: :functions"
+IO.puts "    except: (import everything except the following)"
+
+IO.puts "\nuse"
+IO.puts "• bring external functionality into the current lexical scope"
+IO.puts """
+defmodule AssertionTest do
+  use ExUnit.Case, async: true
+
+  test "always pass" do
+    assert true
+  end
+end
+"""
+
+
+
