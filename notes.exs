@@ -558,24 +558,6 @@ defmodule DoBlock do
 end
 """
 
-IO.puts "\nFunction Capturing…"
-IO.puts "• retrieve a named function as a function type"
-IO.puts "• capture a local or imported function in the same way: q = &is_function/1"
-IO.puts "• capture a function from a module: q = &Math.zero?/1"
-
-q8 = &GuardsMultipleClauses.zero?/1
-q9 = &GuardsMultipleClauses.zero?/2
-IO.puts "    is 'q' a function? #{is_function(q8)}"
-IO.puts "    is 'q' a function? #{is_function(q9)}"
-IO.puts "• remember an anonymous function must be invoked with a dot (.)"
-IO.puts "• the capture operator allows named functions to be assigned, passed"
-IO.puts "  and invoked just like anonymous functions."
-IO.puts "• the capture syntax can also be used as a shortcut for creating functions."
-q10 = &(&1+1)
-IO.puts "    &(&1+1) is equivalent to fn x -> x + 1 end"
-IO.puts "    q10.(1) = #{q10.(1)}"
-IO.puts "• the &1 represents the first argument passed into the function."
-IO.puts "    q = &List.flatten(&1, &2) is equivalent to fn(list, tail) -> List.flatten(list, tail) end"
 
 IO.puts "\nDefault Arguments…"
 IO.puts "• named functions support default arguments: \\ \"value\""
@@ -897,16 +879,32 @@ IO.puts "=======================================================================
 IO.puts "\nalias"
 IO.puts "• allows you to setup aliases for any given module name, eg. I want to call Bar instead of Foo.Bar "
 IO.puts "    alias Foo.Bar, as: Bar"
+HelloWorld.doodle()
+HelloWorld.Greetings.something()
+
+alias HelloWorld.Greetings, as: HelloThere
+HelloThere.something()
+
 IO.puts "• you can omit the as: portion and the alias will automatically be the last part of the module name."
 IO.puts "    alias Foo.Bar"
 IO.puts "       ^^ is the same as alias Foo.Bar as: Bar"
+
+alias HelloWorld.Greetings
+Greetings.something()
+
 IO.puts "• alias is lexically scoped, so you can set aliases inside specific functions"
 IO.puts "• multi-alias can be achieve like so…"
 IO.puts "   alias MyApp.{Foo, Bar, Baz}"
 
+alias HelloWorld.{Greetings, Goodbyes}
+Goodbyes.ciao()
+Greetings.something()
+
 IO.puts "\nrequire"
 IO.puts "• in order to use macros in modules, you need to opt-in by requiring the module they are defined in."
 IO.puts "• require is lexically scoped, so you can require inside specific functions"
+require Integer
+IO.puts "    Integer.is_odd(3), #{Integer.is_odd(3)}"
 
 IO.puts "\nimport"
 IO.puts "• used when you want to easily access functions or macros from other modules without using the fully qualified name."
@@ -920,6 +918,8 @@ IO.puts "    only: (No need to import all the functions)"
 IO.puts "        :macros (only import macros) > import Integer, only: :macros"
 IO.puts "        :functions (only import functions) > import Integer, only: :functions"
 IO.puts "    except: (import everything except the following)"
+import HelloWorld.Greetings, only: [something: 0]
+something()
 
 IO.puts "\nuse"
 IO.puts "• bring external functionality into the current lexical scope"
@@ -933,5 +933,105 @@ defmodule AssertionTest do
 end
 """
 
+IO.puts "\n\n============================================================================="
+IO.puts "Module Attributes"
+IO.puts "============================================================================="
+IO.puts "• annotate the module with information to be used by the user or the VM"
+IO.puts "• work as constants"
+IO.puts "• work as temporary module storage to be used during compilation"
+
+IO.puts "\nAs annotations"
+IO.puts "    @vsn - explicity setting the version, otherwise version is set to MD5 checksum of the module"
+IO.puts "    @moduledoc - provides documentation for the current module"
+IO.puts "    @doc - provides documentation for the function or the macro"
+IO.puts "    @behaviour - specifying OTP or user defined behaviour"
+IO.puts "    @before_compile - provides a hook before the module is compiled"
+
+IO.puts "\nAs constants"
+IO.puts "• a constant starts with the @ character."
+defmodule MyServer do
+  @initial_state %{host: "127.0.0.1", port: 3456}
+  IO.inspect @initial_state
+end
+
+IO.puts "• constants can be read inside functions"
+
+# redo this chapter.
+
+IO.puts "\n\n============================================================================="
+IO.puts "Structs"
+IO.puts "============================================================================="
+IO.puts "• structs are extensions built on top of maps"
+IO.puts "• compile-time checks and default values"
+IO.puts "• structs take the name of the module they are defined in"
+
+IO.puts "• if no default value is specified when defining the struct, the nil will be assumed."
+defmodule User do
+    @enforce_keys [:name, :age]
+    defstruct [:name, :age, home: "Canada"] 
+end
+
+q4 = %User{age: 22, name: "Jane"}
+IO.puts "    User.age = #{q4.age}"
+IO.puts "    User.name = #{q4.name}"
+IO.puts "    User.home = #{q4.home}"
+
+IO.puts "• use the update syntax |"
+q5 = %{q4 | name: "Meg"}
+IO.puts "    #{inspect q5}"
+
+IO.puts "• pattern matching"
+%User{name: qq5} = q4
+IO.puts "    %User{name: qq5} = q4"
+IO.puts "    qq5 = #{qq5}"
+
+IO.puts "• structs are bare maps underneath"
+IO.puts "    is_map(q5)? #{is_map(q5)}"
+IO.puts "    q5.__struct__? #{q5.__struct__}"
+
+IO.puts "• structs are referred to bare maps, because they don't have the same protocols implemented."
+IO.puts "  eg. enumeration, access"
+IO.puts "• structs work great with functions from the Map module"
+IO.puts inspect Map.keys(q5)
+IO.puts inspect Map.values(q5)
+
+
+IO.puts "\n\n============================================================================="
+IO.puts "Protocols"
+IO.puts "============================================================================="
+IO.puts "• a mechanism to achieve polymorphism at the data/type level"
+IO.puts "• write code that can be extended to work with new data types I don't know about yet."
+IO.puts "• it's possible to implement protocols for all types:"
+IO.puts "    Atom, BitString, Float, Function, Integer, List, Map, PID, Port, Reference, Tuple"
+
+defprotocol Size do
+    def size(data)
+end
+
+defimpl Size, for: BitString do
+    def size(string), do: byte_size(string)
+end
+
+IO.puts Size.size("foog")
+
+defimpl Size, for: Map do
+    def size(map), do: map_size(map)
+end
+
+IO.puts Size.size(%{label: "some label"})
+
+defimpl Size, for: Tuple do
+    def size(tuple), do: tuple_size(tuple)
+end
+
+IO.puts Size.size({:ok, "hello"})
+
+IO.puts "\nProtocols and structs"
+
+
+
+
+# Behaviours vs Protocols
+# https://www.djm.org.uk/posts/elixir-behaviours-vs-protocols-what-is-the-difference/
 
 
