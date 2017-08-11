@@ -407,63 +407,13 @@ IO.puts "• [a: a] = [a: 1], a = #{p6}"
 
 IO.puts "\nMaps"
 IO.puts "=================================================================="
-IO.puts "• the go to data structure"
-IO.puts "• allow any value as a key."
-IO.puts "• do not follow any ordering."
-IO.puts "• very helpful with pattern matching."
-IO.puts "• created using the %{} syntax:"
-q1 = %{:a => 1, 2 => :b}
-IO.puts "    %{:a => 1, 2 => :b}"
-IO.puts "    What is the value of :a? #{q1[:a]}"
-IO.puts "    What is the value of 2? #{q1[2]}"
-IO.puts "    What is the value of :c? #{q1[:c]} nil"
+
 
 IO.puts "\nPattern Matching…"
-IO.puts "• will always match on a subset of the given value:"
-IO.puts "    %{:a => a} = %{:a => 1, 2 => :b}"
-case %{:a => 1, 2 => :b} do
-    %{:a => a} -> IO.puts "        a = #{a}"
-    _ -> IO.puts "        No match found."
-end
 
-IO.puts "    %{:c => c} = %{:a => 1, 2 => :b}"
-case %{:a => 1, 2 => :b} do
-    %{:c => c} -> IO.puts "        c = #{c}"
-    _ -> IO.puts "        No match found."
-end
-
-IO.puts "• an empty map matches all maps:"
-IO.puts "    %{} = %{:a => 1, 2 => :b}"
-case %{:a => 1, 2 => :b} do
-    %{} -> IO.puts "        match all maps"
-end
-
-IO.puts "• variables can be used when accessing, matching and adding key maps."
-q2 = 1
-q3 = %{q2 => :one}
-IO.puts "    q2 = 1"
-IO.puts "    q3 = %{q2 => :one}"
-IO.puts "    q3[q2]? #{q3[q2]}"
-IO.puts "• remember the ^ operator allows you to match against an existing variable"
-IO.puts "    %{^q2 => one} = %{1 => :one, 2 => :two, 3 => :three}"
-case %{1 => :one, 2 => :two, 3 => :three} do
-    %{^q2 => one} -> IO.puts "        Match!"
-end
 
 IO.puts "\nManipulate Maps…"
-q4 = %{:a => 1, 2 => :b}
-q5 = Map.get(q4, :a)
-IO.puts "• Map.get(%{:a => 1, 2 => :b}, :a) = #{q5}"
-IO.puts "• Map.put(%{:a => 1, 2 => :b}, :c, 3) == %{2 => :b, :a => 1, :c => 3}? #{Map.put(q4, :c, 3) == %{2 => :b, :a => 1, :c => 3}}"
-IO.puts "• Map.to_list(%{:a => 1, 2 => :b}) == [{2, :b}, {:a, 1}]? #{Map.to_list(q4) == [{2, :b}, {:a, 1}]}"
-IO.puts "• update a key's value (key must exist):"
-q6 = %{q4 | 2 => "two"}
-IO.puts "    %{%{:a => 1, 2 => :b} | 2 => \"two\"} == %{:a => 1, 2 => :b}? #{q4 == q6}"
-IO.puts "• the | cannot be used to add new keys"
 
-IO.puts "\nAccessing atom keys…"
-IO.puts "• %{:a => 1, 2 => :b}.a = #{%{:a => 1, 2 => :b}.a}"
-IO.puts "• use the map.field syntax and pattern matching instead of functions in the Map module."
 
 IO.puts "\nNested Data Structures"
 IO.puts "=================================================================="
@@ -558,43 +508,6 @@ defmodule DoBlock do
 end
 """
 
-
-IO.puts "\nDefault Arguments…"
-IO.puts "• named functions support default arguments: \\ \"value\""
-IO.puts """
-defmodule Concat do
-    def join(a, b, sep \\ "-") do
-        # remember <> is a string concatenator
-        a <> sep <> b
-    end
-end
-"""
-
-require Concat
-IO.puts "    #{Concat.join("Hello", "World")}"
-IO.puts "    #{Concat.join("Hello", "World", "+")}"
-IO.puts "• default values are only evaluated if they have to be used."
-IO.puts "• be cautious of function definition order with default values."
-IO.puts "• if a function has multiple clauses, it is required to create a"
-IO.puts "  function head without an actual body."
-IO.puts """
-defmodule Words do
-    def join(a, b \\ nil, sep \\ "_")
-
-    def join(a, b, sep) when is_nil(b) do
-        a
-    end
-
-    def join(a, b, sep) do
-        a <> sep <> b
-    end
-end
-"""
-
-require Words
-IO.puts "    #{Words.join("Hello", "World")}"
-IO.puts "    #{Words.join("Hello", "World", "+")}"
-IO.puts "    #{Words.join("Hello")}"
 
 IO.puts "\n\n============================================================================="
 IO.puts "Recursion"
@@ -804,6 +717,8 @@ IO.puts "• seldom will you implement this pattern as there are many other abst
 IO.puts "Agent.start_link(fn)"
 IO.puts "Agent.update(pid, fn)"
 IO.puts "Agent.get(pid, fn)"
+# KeyValueRegistry.start
+
 
 IO.puts "\n\n============================================================================="
 IO.puts "IO and the file system"
