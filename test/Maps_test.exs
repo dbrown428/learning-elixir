@@ -11,7 +11,6 @@ defmodule MapsTest do
   """
   use ExUnit.Case
   doctest Maps.PatternMatching
-  doctest Maps.Manipulating
 
   test "map creation" do
     x = %{:a => 1, 2 => :b}
