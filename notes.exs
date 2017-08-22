@@ -1,103 +1,6 @@
 IO.puts "Playground"
 
 # =============================================================================
-# Basic Types
-# =============================================================================
-
-x = 4
-IO.puts "x: #{x}"
-
-# Returns an integer.
-y = div x, 3
-IO.puts "y: #{y}"
-
-# Returns a float.
-z = x / 3
-IO.puts "z: #{z}"
-
-# Return the remainder
-a = rem x, 3
-IO.puts "a: #{a}"
-
-# Rounding
-b = round 3.58
-IO.puts "b: #{b}"
-
-# Booleans
-c = true
-d = 1
-cd = c == d
-IO.puts "cd: #{cd}"
-
-# Atoms
-e = :hello
-IO.puts "e: #{e}"
-IO.puts "is atom? #{is_atom(e)}"
-IO.puts "is boolean? #{is_boolean(e)}"
-
-# Strings
-f = "hełło
-worldﬁ!"
-IO.puts f
-IO.puts "String length: #{String.length(f)}"
-IO.puts "Is Binary? #{is_binary(f)}"
-IO.puts "bytes: #{byte_size(f)}"
-IO.puts "uppercase:  #{String.upcase(f)}"
-
-# Anonymous Functions
-g = fn arg1, arg2 -> "#{arg1} #{arg2}" end
-
-# the (.) is required to invoke an anonymous function.
-IO.puts g.("hello", 43)
-IO.puts "is function? #{is_function(g)}"
-
-# Arity of the function
-IO.puts "expects 1 argument? #{is_function(g, 1)}"
-IO.puts "expects 2 argument? #{is_function(g, 2)}"
-
-# Functions using functions
-cool = fn a -> g.(a, a) end
-IO.puts cool.(2)
-
-# Linked Lists
-h = ["1", "2", "3"]
-IO.puts "Linked list: #{h}"
-g = ["4", "5", "6"]
-IO.puts "Concatenate: #{h ++ g}"
-i = ["1", "2"]
-IO.puts "Subtract: #{h -- i}"
-IO.puts "head: #{hd(g)}"
-IO.puts "tail: #{tl(g)}"
-i2 = [104, 101, 108, 108, 111]
-IO.puts "list of ASCII numbers: #{i2}"
-
-# prepend items to a list with |
-# list = [1,2,3]
-# [0 | list]
-
-# Accessing the length of a list is a linear operation: we need to traverse the whole list in order to figure out its size. Updating a list is fast as long as we are prepending elements. Calculating the length gets slower as the input grows.
-i3 = [104 | i2]
-IO.puts i3
-IO.puts "linear operation - length: #{length i3}"
-
-# Quotes
-j1 = 'hello'
-j2 = "hello"
-IO.puts "equivalent? #{j1 == j2}"
-
-# Tuples
-# Getting a tuple size or accessing an element by index is fast, as tuples are stored contiguously in memory.
-k = {:world, "hello"}
-IO.puts tuple_size k
-l = put_elem(k, 1, "great")
-IO.puts "equal tuples? #{k == l}"
-IO.puts "tuple element: #{elem(l, 0)}"
-
-# Simple Rule: the function is named 'size' if the operation is in constant time (ie. the value is pre-calculated) or 'length' if the operation is linear.
-# byte_size, tuple_size ~ constant time
-# length, String.length ~ linear time
-
-# =============================================================================
 # Basic Operators
 # =============================================================================
 
@@ -252,9 +155,7 @@ end)
 IO.puts "\n\n============================================================================="
 IO.puts "Modules and Functions"
 IO.puts "============================================================================="
-IO.puts "• groups several functions into modules."
-IO.puts "• create a module using the 'defmodule' macro, and 'def' to define functions."
-IO.puts "• it's convenient to write modules into files so they can be compiled and reused."
+
 
 IO.puts """
 defmodule Math do
@@ -278,46 +179,6 @@ IO.puts "• .exs files are for scripting"
 IO.puts "• .ex files are meant to be compiled"
 IO.puts "• when executed, both extensions compile and load their modules into memory"
 IO.puts "• .ex files write bytecode to disk in the format of .beam files"
-
-IO.puts "\nNamed functions…"
-IO.puts "• private functions are defined with 'defp'"
-IO.puts """
-defmodule LoveLife do
-    def sum(a, b) do
-        do_sum(a, b)
-    end
-
-    defp do_sum(a, b) do
-        a + b
-    end
-end
-"""
-
-require LoveLife
-IO.puts "    LoveLife.sum(4, 5) = #{LoveLife.sum(4, 5)}"
-IO.puts """
-defmodule GuardsMultipleClauses do
-    def zero?(0) do
-        true
-    end
-
-    def zero?(x) when is_integer(x) do
-        false
-    end
-end
-"""
-
-require GuardsMultipleClauses
-IO.puts "    GuardsMultipleClauses.zero?(0)? #{GuardsMultipleClauses.zero?(0)}"
-IO.puts "    GuardsMultipleClauses.zero?(2)? #{GuardsMultipleClauses.zero?(2)}"
-IO.puts "• given an argument that does not match any of the clauses raises an error."
-IO.puts "• named functions support both do: and do/end block syntax"
-IO.puts """
-defmodule DoBlock do
-    def zero?(0), do: true
-    def zero?(x) when is_float(x), do: false
-end
-"""
 
 
 IO.puts "\n\n============================================================================="
@@ -371,98 +232,10 @@ end
 require Mapping
 Mapping.double_each([1,2,3])
 
-IO.puts "\n\n============================================================================="
-IO.puts "Enumerables"
-IO.puts "============================================================================="
-
-IO.puts "• You rarely use recursion as above to manipulate lists. Use the Enum module."
-IO.puts "• all the functions in the Enum module are eager, eg. expect an enumerable and "
-IO.puts "  return a list back."
-r0 = Enum.reduce([1,2,3], 0, fn(x, acc) -> x + acc end)
-IO.puts "    Enum.reduce([1,2,3]… #{r0}"
-r1 = Enum.map([1,2,3], fn(x) -> x * 2 end)
-IO.puts "    Enum.map([1,2,3], fn x -> x * 2 end"
-Enum.map(r1, fn rr1 -> IO.puts rr1 end)
-
-r2 = Enum.map(%{1 => 2, 3 => 4}, fn {k, v} -> k * v end)
-IO.puts r2
-
-IO.puts "\nRanges"
-IO.puts "• Enum.map(1..3, fn x -> x * 2 end)"
-Enum.map(1..3, fn rr3 -> IO.puts "    #{rr3 * 3}" end)
-
-r4 = Enum.reduce(1..3, 0, fn(rr4, acc) -> rr4 + acc end)
-IO.puts "• Enum.reduce(1..3, 0, fn (x, acc) -> x + acc end)"
-IO.puts "    #{r4}"
-
-# We are capturing the function in a value. Equivalent to: fn x -> rem(x, 2) != 0 end
-r5_odd? = &(rem(&1, 2) != 0)
-r5 = Enum.filter(1..3, r5_odd?)
-IO.puts "• Enum.filter(1..3, fn x -> rem(x, 2) != 0 end)"
-Enum.map(r5, fn x -> IO.puts "    #{x}" end)
-
-IO.puts "\nPipe Operator"
-IO.puts "• Takes output from the expression on the left side and passes it as the first"
-IO.puts "  argument to the function on the right side."
-r6? = &(&1 * 3)
-r7 = 1..100_000 
-    |> Enum.map(r6?)
-    |> Enum.filter(r5_odd?)
-    |> Enum.sum
-
-IO.puts "    1..100_000"
-IO.puts "        |> Enum.map(r6?)"
-IO.puts "        |> Enum.filter(r5_odd?)"
-IO.puts "        |> Enum.sum"
-IO.puts "    = #{r7}"
-
-IO.puts "\nStreams"
-IO.puts "• streams are lazy, composable enumerables"
-IO.puts "• streams build a series of computations that are invoked only when"
-IO.puts "  we pass the underlying stream to the Enum module."
-IO.puts "• streams are useful when working with large, possibly infinite, collections."
-
-r8 = 1..100_100
-    |> Stream.map(r6?)
-    |> Stream.filter(r5_odd?)
-    |> Enum.sum
-
-IO.puts "    1..100_100"
-IO.puts "        |> Stream.map(&(&1 *3))"
-IO.puts "        |> Stream.filter(r5_odd?)"
-IO.puts "        |> Enum.sum"
-IO.puts "    = #{r8}"
-
-r9 = Stream.cycle([1,2,3])
-rr9 = Enum.take(r9, 10)
-IO.puts inspect rr9
-
-IO.puts "• Stream.unfold(\"hełło\", &String.next_codepoint/1)"
-r10 = Stream.unfold("hełło", &String.next_codepoint/1)
-rr10 = Enum.take(r10, 3)
-Enum.map(rr10, fn x -> IO.puts "    #{x}" end)
-
-IO.puts "• Stream.resource/3"
-# Enum.take(stream, 10)
 
 IO.puts "\n\n============================================================================="
 IO.puts "Processes"
 IO.puts "============================================================================="
-
-IO.puts "• all code runs inside processes"
-IO.puts "• processes are isolated from each other, run concurrent to one another,"
-IO.puts "  and communicate via message passing."
-IO.puts "• extrememly lightweight in terms of memory and CPU"
-
-IO.puts "\nspawn"
-IO.puts "• takes a function and executes it in another process"
-IO.puts "• returns a process identifier"
-
-pid1 = spawn fn -> 1 + 2 end
-IO.puts "Is process alive? #{Process.alive?(pid1)}"
-
-pid2 = self()
-IO.puts "Is process alive? #{Process.alive?(pid2)}"
 
 IO.puts "\nSend and Receive"
 IO.puts "• when a message is sent to a process, the message is stored in the process mailbox."

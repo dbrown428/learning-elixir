@@ -5,6 +5,10 @@ defmodule GuardsMultipleClausesTest do
         assert GuardsMultipleClauses.zero?(0) == true
     end
 
+    @doc """
+    Given an argument that does not match any of the clauses will raise an 
+    error.
+    """
     test "not zero float" do
         assert_raise FunctionClauseError, fn ->
             GuardsMultipleClauses.zero?(4.5)
