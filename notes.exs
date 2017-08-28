@@ -59,6 +59,7 @@ IO.puts "head = #{head}"
 IO.puts "tail = #{tail}"    # no value output... ??
 
 # Pin Operator - match a variables value instead of rebinding
+# ^ operation allows you to pattern match against an existing variable.
 n8 = 34
 {n9, n8} = {2, 34}
 IO.puts "match variable value: #{n9}"
@@ -67,118 +68,6 @@ IO.puts "match variable value: #{n9}"
 [h | _] = [1, 2, 3]
 IO.puts h
 
-# =============================================================================
-# Control Structures
-# =============================================================================
-
-# Case - is useful when you need to match against different values.
-# ^ operation allows you to pattern match against an existing variable.
-case {1, 2, 3} do
-    {4, 5, 6} -> IO.puts "No match"
-    {1, ^n8, 3} -> IO.puts "no match"
-    {1, o, 3} -> IO.puts "Matched pattern: #{o}"
-    _ -> IO.puts "match any value"
-end
-
-# Case guards
-case {1, 0, 3} do
-    {1, o1, 3} when o1 > 0 -> IO.puts "No match"
-    _ -> IO.puts "Default match"
-end
-
-# Errors in guards do not leak, but make the guard fail
-case 1 do
-    x when hd(x) -> IO.puts "Won't match'"
-    x -> IO.puts "Got #{x}"
-end
-
-# The number of arguments in each anonymous function clause needs to be the same.
-f = fn
-    x, y when x > 0 -> x + y
-    x, y -> x * y
-    # x, y, z -> x * y + z ... will not work.
-end
-IO.puts "Anonymous fn with clauses and guards: #{f.(1, 3)}"
-
-# Cond - useful when you want to check different conditions and find the first
-#        one that evaluates to true. Equivalent to else-if in many imperative languages.
-cond do
-    2 + 2 == 5 -> "This will not be true"
-    2 * 2 == 3 -> "This will also not be true"
-    1 + 1 == 2 -> IO.puts "cond true"
-end
-
-# Cond considers any value besides nil and false to be true.
-cond do
-    hd([1,2,3]) -> IO.puts "1 is considered as true"
-end
-
-# if and unless are useful when you need to check for only one condition
-if true do
-    IO.puts "if true"
-end
-
-unless false do
-    IO.puts "unless false"
-end
-
-# false or nil
-if nil do
-    "this won't be seen"
-else
-    IO.puts "not nil"
-end
-
-# do/end blocks
-# this syntax is using 'keyword lists'.
-if true, do: IO.puts "do/end with comma separator"
-if false, do: IO.puts "do/end", else: IO.puts "keyword list with else"
-
-# the next two do/end blocks are equivalent:
-if true do 
-    a = 1 + 2
-    a + 10
-end
-
-if true, do: (
-    a = 1 + 2
-    a + 10
-)
-
-# do/end blocks are always bound to the outermost function call. Explicit
-# parantheses can change the block binding.
-IO.puts is_number(if true do 
-    1 + 2
-end)
-
-
-IO.puts "\n\n============================================================================="
-IO.puts "Modules and Functions"
-IO.puts "============================================================================="
-
-
-IO.puts """
-defmodule Math do
-    def sum(a, b) do
-        a + b
-    end
-end
-"""
-
-require Math
-IO.puts "    Math.sum(1, 2) = #{Math.sum(1, 2)}"
-
-IO.puts "• projects are usually organized into three directories:"
-IO.puts "    ebin - contains the compiled bytecode"
-IO.puts "    lib - contains elixir code (usually .ex files)"
-IO.puts "    test - contains tests (usually .exs files)"
-IO.puts "• mix will be responsible for compiling and setting up proper paths"
-
-IO.puts "\nScripted Mode…"
-IO.puts "• .exs files are for scripting"
-IO.puts "• .ex files are meant to be compiled"
-IO.puts "• when executed, both extensions compile and load their modules into memory"
-IO.puts "• .ex files write bytecode to disk in the format of .beam files"
 
 
 IO.puts "\n\n============================================================================="
@@ -201,17 +90,6 @@ end
 require Loop
 Loop.print_multiple_times("Hello!", 3)
 
-IO.puts """
-defmodule Reducing do
-    def sum_list([head | tail], accumulator) do
-        sum_list(tail, head + accumulator)
-    end
-
-    def sum_list([], accumulator) do
-        accumulator
-    end
-end
-"""
 
 require Reducing
 IO.puts Reducing.sum_list([1,2,3], 0)
