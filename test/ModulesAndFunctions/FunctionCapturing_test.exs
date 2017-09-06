@@ -5,7 +5,9 @@ defmodule FunctionCapturingTest do
   ===============================================================================
   • Retrieve a named function as a function type
   • the capture operator allows named functions to be assigned, passed, and 
-    invoked just like anonymous functions
+    invoked just like anonymous functions.
+  • & can turn a function into an anonymous function which can be passed as 
+    arguments to other functions or bound to a variable.
   • remember an anonymous function must be invoked with a dot (.)
   """
   use ExUnit.Case

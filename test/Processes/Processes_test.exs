@@ -5,7 +5,7 @@ defmodule ProcessesTest do
   extrememly lightweight in terms of memory and CPU
   """
   use ExUnit.Case
-  doctest Processes
+  doctest Processes.SendReceive
 
   @doc """
   Spawn takes a function and executes it in another process and returns a 

@@ -69,73 +69,9 @@ IO.puts "match variable value: #{n9}"
 IO.puts h
 
 
-
-IO.puts "\n\n============================================================================="
-IO.puts "Recursion"
-IO.puts "============================================================================="
-
-IO.puts """
-defmodule Loop do
-    def print_multiple_times(message, count) when count <= 1 do
-        IO.puts message
-    end
-
-    def print_multiple_times(message, count) do
-        IO.puts message
-        print_multiple_times(message, count - 1)
-    end
-end
-"""
-
-require Loop
-Loop.print_multiple_times("Hello!", 3)
-
-
-require Reducing
-IO.puts Reducing.sum_list([1,2,3], 0)
-
-IO.puts """
-defmodule Mapping do
-    def double_each([head | tail]) do
-        #prepend the doubled head value to the list
-        [head * 2 | double_each(tail)]
-    end
-
-    def double_each([]) do
-        []
-    end
-end
-"""
-
-require Mapping
-Mapping.double_each([1,2,3])
-
-
 IO.puts "\n\n============================================================================="
 IO.puts "Processes"
 IO.puts "============================================================================="
-
-IO.puts "\nSend and Receive"
-IO.puts "• when a message is sent to a process, the message is stored in the process mailbox."
-IO.puts "• the process that sends the message does not block on send/2. It puts the message in"
-IO.puts "  the receipent's mailbox and continues."
-IO.puts "\nsending message to self…\n"
-send self(), {:hello, "world"}
-
-IO.puts "• the receive block goes through the current process mailbox searching for a message"
-IO.puts "  that matches any of the given patterns."
-IO.puts "• receive supports guards and many clauses, such as case/2"
-IO.puts "• if there is no message in the mailbox matching any of the patterns, the current"
-IO.puts "  process will wait until a matching message arrives."
-
-receive do
-    {:hello, msg} -> IO.puts "\nMessage Received: #{msg}\n"
-    {:world, msg} -> IO.puts "Won't match: #{msg}"
-after
-    1_000 -> IO.puts "Nothing after 1 second"
-end
-
-IO.puts "• a timeout of 0 can be given when you already expect the message to be in the mailbox."
 
 IO.puts "\ninspect"
 IO.puts "• used to convert a data structure's internal representation into a string."
